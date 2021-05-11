@@ -1,484 +1,289 @@
 #include<iostream>
-#include<vector>
+#include<string>
+#include<vld.h>
 using namespace std;
 
-namespace bit58
+//深拷贝 浅拷贝
+class String
 {
-	template<class _Ty>
-	class vector
+public:
+	String(const char *str="")
 	{
-	public:
-		typedef _Ty*  iterator;
-	public:
-		vector():_start(nullptr),_finish(nullptr),_end(nullptr)
-		{}
-	public:
-		size_t size()const
+		m_data = new char[strlen(str)+1];
+		strcpy(m_data, str);
+	}
+	String(const String &s)
+	{
+		m_data = new char[strlen(s.m_data)+1];
+		strcpy(m_data, s.m_data);
+	}
+	String& operator=(const String &s)
+	{
+		if(this != &s)
 		{
-			return _finish - _start;
+			delete []m_data;  //异常不安全
+			m_data = new char[strlen(s.m_data)+1];
+			strcpy(m_data, s.m_data);
 		}
-		size_t capacity()const
-		{
-			return _end - _start;
-		}
-		bool empty()const
-		{
-			return size() == 0;
-		}
-	public:
-		iterator begin()
-		{
-			return _start;
-		}
-		iterator end()
-		{
-			return _finish;
-		}
-		void push_back(const _Ty &x)
-		{
-			insert(end(), x);
-		}
-	public:
-		iterator insert(iterator _P, const _Ty &x)
-		{
-			int old_sz = size();
-			int old_cap = capacity();
-
-			if(old_sz+1 > old_cap)
-			{
-				//扩容
-
-				size_t it_pos = _P - _start;
-
-				size_t new_cap = old_cap==0 ? 1 : old_cap * 2;
-				reserve(new_cap);
-
-				//更新迭代器
-				_P = _start + it_pos;
-			}
-
-			//移动数据
-			iterator end = _finish++;
-			while(end > _P)
-			{
-				*end = *(end-1);
-				end--;
-			}
-
-			*_P = x;
-			return _P;
-		}
-		void reserve(size_t n)
-		{
-			if(n > capacity())
-			{
-				int old_size = size();
-
-				_Ty *new_base = new _Ty[n];
-
-				if(_start)
-				{
-					memcpy(new_base, _start, sizeof(_Ty)*old_size);
-					delete []_start;
-				}
-
-				_start = new_base;
-				_finish = _start + old_size;
-				_end = _start + n;
-			}
-		}
-	private:
-
-		iterator _start;
-		iterator _finish;
-		iterator _end;
-	};
+		return *this;
+	}
+	~String()
+	{
+		delete []m_data;
+		m_data = nullptr;
+	}
+private:
+	char *m_data;
 };
 
 void main()
 {
-	bit58::vector<int> iv;
-
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-
-	//iv.reserve(10);
-	//iv.insert(iv.begin(), 1);
-	//iv.insert(iv.end(), 2);
-	iv.push_back(1);
-	iv.push_back(2);
-	iv.push_back(3);
-
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-
-	auto it = iv.begin();
-	while(it != iv.end())
-	{
-		cout<<*it<<" ";
-		++it;
-	}
-	cout<<endl;
+	//写时拷贝
+	String s1("abc");//fjlajflajflaflafjalfjlfjlajflkjfjfajflkafljalfjalkfjal
+	String s2("xyz");
+	String s3 = s2;
+	String s3 = s2;
+	String s3 = s2;
+	String s3 = s2;
+	String s3 = s2;
+	String s3 = s2;
+	String s3 = s2;
 }
 
-
 /*
-void  main()
+#include<iostream>
+#include<string>
+#include<algorithm>
+using namespace std;
+
+void main()
 {
-	vector<vector<int>> vv;
-	vv.resize(5);
+	string str = "A man, a plan, a canal: Panama";
+	cout<<str<<endl;
+	//transform(str.begin(),str.end(), str.begin(), toupper);
+	//transform(str.begin(),str.end(), str.begin(), tolower);
 
-	for(int i=0; i<5; ++i)
-	{
-		vv[i].resize(5);
-	}
+	reverse(str.begin(), str.end());
 
-	for(int i=0; i<5; ++i)
-	{
-		for(int j=0; j<5; ++j)
-		{
-			cout<<vv[i][j]<<" ";
-		}
-		cout<<endl;
-	}
+	cout<<str<<endl;
 }
 
 /*
+size_t GetLengthOfLastWord(const string &str)
+{
+    size_t pos = str.rfind(' ');
+    return str.size()-pos-1;  //-(-1)-1
+}
+
 int main()
 {
-	vector<int> v{ 1, 2, 4,3  };
+    string str;
+    getline(cin, str);
+	size_t len = GetLengthOfLastWord(str);
+    cout<<len;
+    return 0;
+}
 
-	auto it = v.begin();
-	while (it != v.end())
+/*
+void main()
+{
+	string s1("abc");
+	string s2("xyz");
+
+	string ret = s1 + s2;
+	cout<<ret<<endl;
+
+	//string str;
+	//cin>>str;
+	//getline(cin, str);
+	//cout<<str<<endl;
+
+	if(s1 == s2)
+		cout<<"s1>s2"<<endl;
+	else
+		cout<<"s1<=s2"<<endl;
+}
+
+/*
+//python(接口)报表  java   C/C++可塑性强  Java  go php 解决问题
+void main()
+{
+	string str("abcxyzhijkzllmn");
+	string ret = str.substr(7, 3);
+	cout<<ret<<endl;
+}
+
+/*
+void main()
+{
+	string str("abcxyzhijkzllmn");
+
+	//size_t index = str.find('x');
+	size_t index = str.find('z', 6);
+
+	if(index == string::npos)
+		cout<<"不存在"<<endl;
+	else
+		cout<<"index = "<<index<<endl;
+}
+
+/*
+void main()
+{
+	string str("1234");
+	
+	int value = atoi(str.c_str());
+
+	cout<<"value = "<<value<<endl;
+}
+
+/*
+void main()
+{
+	string str;
+	str.push_back('a');
+	str.push_back('b');
+	str.push_back('c');
+	str.append("xyz");
+	str.append("sdfghjk", 4);
+	cout<<str<<endl;  //abcxyzsdfg
+
+	string str1("asd");
+	//str1.append(str, 3, 3);
+	//str1.append(str);
+	//str1.append({'a','b','c'});
+	//str1.append("abc");
+	str1 += str;
+	cout<<str1<<endl;
+}
+
+/*
+void main()
+{
+	string str("abcxyz");
+	cout<<str<<endl;  //1
+	
+	for(int i=0; i<str.size(); ++i)
+		cout<<str[i]; //2
+	cout<<endl;
+	
+	for(auto &e : str) //3
+		cout<<e;
+	cout<<endl;
+
+	string::iterator it = str.begin();
+	while(it != str.end())
 	{
-		if (*it % 2 == 0)
-			it = v.erase(it);
-		else
-			++it;
-	}
-
-	for(auto &e : v)
-		cout<<e<<" ";
-	cout<<endl;
-
-	return 0;
-}
-
-/*
-void main()
-{
-	vector<int> iv1{1,2,3,4,5};
-	auto it = find(iv1.begin(), iv1.end(), 3);
-	
-	cout<<*it<<endl;
-
-	it = iv1.erase(it);
-
-	cout<<*it<<endl;
-}
-
-/*
-void main()
-{
-	vector<int> iv1{1,2,3,4,5};
-	auto it = find(iv1.begin(), iv1.end(), 3);
-
-	cout<<*it<<endl;
-	iv1.push_back(10);
-
-	it = find(iv1.begin(), iv1.end(), 3);
-	cout<<*it<<endl;
-
-}
-
-/*
-void main()
-{
-	vector<int> iv1{1,2,3,4,5,6,7,8,9,10};
-
-	for(int i=0; i<=iv1.size(); ++i)
-		cout<<iv1[i]<<" ";
-	cout<<endl;
-
-	for(int i=0; i<=iv1.size(); ++i)
-		cout<<iv1.at(i)<<" ";
-	cout<<endl;
-
-}
-
-/*
-void main()
-{
-	vector<int> iv1{1,2,3,4};
-	vector<int> iv2{5,6};
-
-	for(int i=0; i<iv1.size(); ++i)
-		cout<<iv1[i]<<" ";
-	cout<<endl;
-	
-	for(int i=0; i<iv2.size(); ++i)
-		cout<<iv2[i]<<" ";
-	cout<<endl;
-
-	//iv1.swap(iv2);
-	//iv1.assign(iv2.begin(), iv2.end());
-	iv1.assign(10, 8);
-
-	for(int i=0; i<iv1.size(); ++i)
-		cout<<iv1[i]<<" ";
-	cout<<endl;
-	
-	for(int i=0; i<iv2.size(); ++i)
-		cout<<iv2[i]<<" ";
-	cout<<endl;
-
-}
-
-/*
-void main()
-{
-	vector<int> iv1{1,2,3,4};
-	vector<int> iv2{5,6,7,8,9,10};
-
-	
-	for(int i=0; i<iv1.size(); ++i)
-		cout<<iv1[i]<<" ";
-	cout<<endl;
-	
-	for(int i=0; i<iv2.size(); ++i)
-		cout<<iv2[i]<<" ";
-	cout<<endl;
-
-	iv1.swap(iv2);
-
-	
-	for(int i=0; i<iv1.size(); ++i)
-		cout<<iv1[i]<<" ";
-	cout<<endl;
-	
-	for(int i=0; i<iv2.size(); ++i)
-		cout<<iv2[i]<<" ";
-	cout<<endl;
-
-}
-
-/*
-void main()
-{
-	vector<int> iv3{1,2,3,4,5,6,7,8,9,10};
-
-	vector<int>::iterator pos =iv3.begin();
-
-	iv3.insert(pos, 100);
-	vector<int>::iterator pos1 = iv3.end();
-	iv3.insert(pos1, 200);
-
-	auto pos2 = find(iv3.begin(), iv3.end(), 5);
-	//iv3.insert(pos2, 3, 300);
-	iv3.insert(pos2, iv3.begin(), iv3.end());
-
-	auto it = iv3.begin();
-	while(it != iv3.end())
-	{
-		cout<<*it<<" ";
-		++it;
-	}
-	cout<<endl;
-}
-
-/*
-void main()
-{
-	vector<int> iv3{1,2,3,4,5,6,7,8,9,10};
-	vector<int>::iterator it = iv3.begin();
-
-	iv3.pop_back();
-	auto pit = find(iv3.begin(), iv3.end(), 5);
-	cout<<*pit<<endl;
-
-	*pit = 20;
-	iv3.erase(pit);
-
-
-	while(it != iv3.end())
-	{
-		cout<<*it<<" ";
-		++it;
-	}
-	cout<<endl;
-}
-
-/*using namespace std;
-
-void main()
-{
-	vector<int> iv;
-	//iv.resize(10);
-	iv.reserve(100);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.reserve(10);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-}
-
-/*
-void  main()
-{
-	vector<int> iv;
-
-	iv.reserve(100); //预留出来
-
-	for(int i=0; i<100; ++i)
-	{
-		iv.push_back(i);
-		cout<<"size = "<<iv.size()<<endl;
-		cout<<"capacity = "<<iv.capacity()<<endl;
-	}
-}
-
-/*
-void  main()
-{
-	vector<int> iv;
-	for(int i=0; i<100; ++i)
-	{
-		iv.push_back(i);
-		cout<<"size = "<<iv.size()<<endl;
-		cout<<"capacity = "<<iv.capacity()<<endl;
-	}
-}
-
-
-/*
-void main()
-{
-	vector<int> iv;
-	iv.push_back(1);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-
-	iv.resize(100);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-
-	iv.resize(10);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-}
-
-/*
-void main()
-{
-	vector<int> iv;
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(1);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(2);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(3);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(4);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(5);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(6);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-	iv.push_back(7);
-	cout<<"size = "<<iv.size()<<endl;
-	cout<<"capacity = "<<iv.capacity()<<endl;
-}
-
-/*
-void main()
-{
-	vector<int> iv3{1,2,3,4,5,6,7,8,9,10};
-	vector<int>::iterator it = iv3.begin();
-	while(it != iv3.end())
-	{
-		cout<<*it<<" ";
+		cout<<*it;
 		++it;
 	}
 	cout<<endl;
 
-	vector<int>::reverse_iterator rit = iv3.rbegin();
-	while(rit != iv3.rend())
+	auto it1 = str.begin();
+	while(it1 != str.end())
 	{
-		cout<<*rit<<" ";
+		cout<<*it1;
+		++it1;
+	}
+	cout<<endl;
+
+	string::reverse_iterator rit = str.rbegin();
+	while(rit != str.rend())
+	{
+		cout<<*rit;
 		++rit;
 	}
 	cout<<endl;
-}
 
-
-/*
-void main()
-{
-	int ar[] = {1,2,3,4,5,6,7,8,9,10};
-	int n = sizeof(ar) / sizeof(ar[0]);
-
-	vector<int> iv(ar, ar+n);
-
-	for(int i=0; i<iv.size(); ++i)
-		cout<<iv[i]<<" ";
-	cout<<endl;
-
-	vector<int> iv1(iv.begin(), iv.end());
-	for(const auto &e : iv1)
-		cout<<e<<" ";
-	cout<<endl;
-
-	vector<int> iv2(iv1); //iv2 = iv1;
-	for(const auto &e : iv2)
-		cout<<e<<" ";
-	cout<<endl;
-
-	//对向量进行初始化  C++11支持
-	vector<int> iv3{1,2,3,4,5,6,7,8,9,10};
-	for(const auto &e : iv3)
-		cout<<e<<" ";
-	cout<<endl;
-}
-
-/*
-void main()
-{
-	vector<int> iv1;
-	vector<int> iv2(10, 5);
-
-	for(int i=0; i<iv2.size(); ++i)
-		cout<<iv2[i]<<" ";
-	cout<<endl;
-
-	for(const auto &e : iv2)
-		cout<<e<<" ";
-	cout<<endl;
-
-	//vector<int>::iterator it = iv2.begin();
-	auto it = iv2.begin();
-	while(it != iv2.end())
+	auto rit1 = str.rbegin();
+	while(rit1 != str.rend())
 	{
-		cout<<*it<<" ";
-		++it;
+		cout<<*rit1;
+		++rit1;
 	}
 	cout<<endl;
 }
 
 /*
-vector  动态数组
-
-class SeqList
-{};
-
 void main()
 {
-	int ar[100] = {0};
+	string str;
+	cout<<"str = "<<str<<endl;
+	cout<<"size = "<<str.size()<<endl;  //STL
+	cout<<"length = "<<str.length()<<endl;
+	cout<<"capacity = "<<str.capacity()<<endl;
+	cout<<"empty = "<<str.empty()<<endl;
+
+	//str.reserve(100); //capacity
+	str.resize(32, '@'); //size  length
+	cout<<"========================="<<endl;
+
+	cout<<"str = "<<str<<endl;
+	cout<<"size = "<<str.size()<<endl;  //STL
+	cout<<"length = "<<str.length()<<endl;
+	cout<<"capacity = "<<str.capacity()<<endl;
+	cout<<"empty = "<<str.empty()<<endl;
+
+	//str.reserve(16); //capacity
+	str.resize(10, '#');
+	cout<<"========================="<<endl;
+
+	cout<<"str = "<<str<<endl;
+	cout<<"size = "<<str.size()<<endl;  //STL
+	cout<<"length = "<<str.length()<<endl;
+	cout<<"capacity = "<<str.capacity()<<endl;
+	cout<<"empty = "<<str.empty()<<endl;
+}
+
+
+/*
+void main()
+{
+	string str("abcxyz");
+	//string str;
+	cout<<"str = "<<str<<endl;
+	cout<<"size = "<<str.size()<<endl;  //STL
+	cout<<"length = "<<str.length()<<endl;
+	cout<<"capacity = "<<str.capacity()<<endl;
+	cout<<"empty = "<<str.empty()<<endl;
+
+	str.clear();
+	cout<<"========================="<<endl;
+
+	cout<<"str = "<<str<<endl;
+	cout<<"size = "<<str.size()<<endl;  //STL
+	cout<<"length = "<<str.length()<<endl;
+	cout<<"capacity = "<<str.capacity()<<endl;
+	cout<<"empty = "<<str.empty()<<endl;
+}
+
+/*
+void main()
+{
+	string s1;
+	string s2("abc");
+	string s3(10, 'a');
+	string s4 = "xyz";
+	string s5 = s4;
+	string s6(s4, 1);
+	string s7(s4.begin(), s4.end());
+	cout<<"s1 = "<<s1<<endl;
+	cout<<"s2 = "<<s2<<endl;
+	cout<<"s3 = "<<s3<<endl;
+	cout<<"s4 = "<<s4<<endl;
+	cout<<"s5 = "<<s5<<endl;
+	cout<<"s6 = "<<s6<<endl;
+	cout<<"s7 = "<<s7<<endl;
+}
+
+/*
+void main()
+{
+	char str[] = "jflafla";
+	char *pstr = "abxyz";
+	strlen(str);
+
+
+	string s1 = "abc";
 }
 */
