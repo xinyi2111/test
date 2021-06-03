@@ -1,23 +1,12 @@
 #include<iostream>
-#include<sstream>
+#include<string.h>
+#include<sdoias.h>
 using namespace std;
+v
 
 
-
-class Base
+oid main()
 {
-public:
 
-
-
-private:
-
-
-
-};
-
-//ЭЌУћвўВи
-void main()
-{
 
 }
