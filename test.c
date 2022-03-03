@@ -1,12 +1,14 @@
-#include "ContactBook.h"
+#include<stdio.h>
 
-void ContactBookTest()
+enum Sex
 {
-	ContactBook cb;
-	ContactBookInit(&cb);
-}
+	male,
+	female
+};
 int main()
 {
-	ContactBookTest();
+	int a = 10;
+	printf("%d\n", sizeof(a));
+	printf("%d\n", sizeof(male));
 	return 0;
 }
